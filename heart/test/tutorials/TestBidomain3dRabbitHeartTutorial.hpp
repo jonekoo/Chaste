@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * First include the headers, `MonodomainProblem` this time.
  */
 #include <cxxtest/TestSuite.h>
-#include "MonodomainProblem.hpp"
+#include "BidomainProblem.hpp"
 #include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "GenericMeshReader.hpp"
 #include "SimpleStimulus.hpp"
@@ -123,7 +123,7 @@ public:
 
         /*
          * Specify the conductivity vector to use in the simulation. Since this is going to be
-         * a monodomain simulation, we only specify intra-cellular conductivities.
+         * a bidomain simulation, we specify intra-cellular and extracellular conductivities.
          * Additionally, because this is an Axi-symmetric mesh then we must specify
          * conductivity along the sheet and normal directions to be the same (an exception will be
          * thrown if not).
@@ -132,6 +132,7 @@ public:
          * normal directions. For a simulation without fibre directions, there should be one value.
          */
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.19, 0.19));
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1.75, 4.*0.19, 4.*0.19));  // This probably does not make sense. Just semi-randomly setting some values.
 
         /*
          * Set the simulation duration, output directory, filename and VTK visualization.
@@ -157,21 +158,21 @@ public:
          * identically to [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample].
          */
         RabbitHeartCellFactory cell_factory;
-        MonodomainProblem<3> monodomain_problem( &cell_factory );
-        monodomain_problem.SetWriteInfo();
-        monodomain_problem.Initialise();
-        monodomain_problem.Solve();
+        BidomainProblem<3> bidomain_problem( &cell_factory );
+        bidomain_problem.SetWriteInfo();
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
 
         /* We can access nodes in the mesh using a `NodeIterator`. Here, we check that each node
          * has not been assigned to bath, and throw an error if it has. This is not a particularly useful test,
          * but it does demonstrate the principle.
          * */
 
-        AbstractTetrahedralMesh<3,3>* p_mesh = &(monodomain_problem.rGetMesh());
+        AbstractTetrahedralMesh<3,3>* p_mesh = &(bidomain_problem.rGetMesh());
 
         /** \todo #2739
         double before_init = GetMemoryUsage();
-        monodomain_problem.Initialise();
+        bidomain_problem.Initialise();
         double after_init = GetMemoryUsage();
         PRINT_VARIABLE(after_init - before_init);
         */
