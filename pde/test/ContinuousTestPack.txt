@@ -26,3 +26,4 @@ utilities/TestPdeSimulationTime.hpp
 utilities/TestQuadraticBasisFunction.hpp
 utilities/TestQuadraturePointsGroup.hpp
 utilities/TestTimeAdaptivityController.hpp
+utilities/TestSimpleVolumeCalculator.hpp
